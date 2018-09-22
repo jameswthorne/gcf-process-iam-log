@@ -1,9 +1,13 @@
-import json
-import sys
 import base64
+import json
+import os
+import sys
 from google.cloud import pubsub
 
 def processIAMLog(event, context):
+    PROJECT_ID=os.environ.get('PROJECT_ID', False)
+    TOPIC_NAME=os.environ.get('TOPIC_NAME', False)
+
     pubsub_message = base64.b64decode(event['data']).decode('utf-8')
 
     data=json.loads(pubsub_message)
@@ -15,8 +19,8 @@ def processIAMLog(event, context):
     dataFinal = json.dumps(dataCombined).encode()
 
     publisher = pubsub.PublisherClient()
-    topic_name = 'projects/{project_id}/topics/{topic}'.format(
-        project_id='PROJECT_ID',
-        topic='TOPIC_NAME',  # Set this to something appropriate.
+    topic_name = 'projects/{project_id}/topics/{topic_name}'.format(
+        project_id=PROJECT_ID,
+        topic_name=TOPIC_NAME,
     )
     publisher.publish(topic_name, dataFinal)
